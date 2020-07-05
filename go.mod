@@ -1,3 +1,3 @@
-module example.com/user/hello
+module  github.com/LeonelSoriano/my-stock-framework
 
 go 1.14
