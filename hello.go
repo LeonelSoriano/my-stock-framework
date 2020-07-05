@@ -1,7 +1,7 @@
-package main
+package mystockFramework
 
 import "fmt"
 
-func main() {
+func run() {
 	fmt.Println("Hello, world.")
 }
