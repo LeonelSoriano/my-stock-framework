@@ -2,11 +2,13 @@ package main
 
 import (
     "fmt"
-    "github.com/LeonelSoriano/my-stock-framework/src/infrastructure"
+    _"github.com/LeonelSoriano/my-stock-framework/src/infrastructure"
+    "github.com/LeonelSoriano/my-stock-framework/src/base/env"
 )
 
 func main() {
-    fmt.Println("rest")
-    infrastructure.DoGet()
-}
 
+    env.IntiEnv(env.IntiEnvParams{})
+    //infrastructure.DoGet()
+    fmt.Println(env.GetEnv("urlDatabase"))
+}

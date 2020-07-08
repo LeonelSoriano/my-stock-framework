@@ -25,7 +25,7 @@ type HttpReqData struct {
 
 
 
-func DoGet() {
+func DoGet(data HttpReqData) {
     timeOut := time.Duration(5 * time.Second)
 
     client := http.Client{
