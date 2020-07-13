@@ -3,48 +3,75 @@ package infrastructure
 import (
     "net/http"
     "time"
-    "log"
+    _"log"
     "io/ioutil"
+    "strings"
+    "encoding/json"
 )
 
-func Sum(x int, y int) int {
-    return x + y
-}
 
 /*type httpData struct{
 
 }*/
 
-type HttpReqData struct {
-    BaseUrl string
-    path string
-    Headers  map[string]string
-    ParamUrl  map[string]string
-    body string
+// default header for all http request
+var default_header = map[string]string{
+    "Content-type": "application/json",
 }
 
+// data for http request
+type HttpReqData struct {
+    BaseUrl string
+    Path string
+    Headers http.Header
+    ParamUrl  map[string]string // parameters in URL example: local?test=1&other=2
+    Method string
+}
 
+// data response http request
+type RespHttp struct {
+    Body map[string]interface{}
+    Headers  http.Header
+    StatusCode int
+}
 
-func DoGet(data HttpReqData) {
+// Call Http request get
+func Do(data HttpReqData) (RespHttp, error) {
     timeOut := time.Duration(5 * time.Second)
+
+    var respHttp RespHttp // wrapper response http
 
     client := http.Client{
         Timeout: timeOut,
     }
 
-    url := "http://dummy.restapiexample.com/api/v1/employees"
+    var url strings.Builder
 
-    request, err := http.NewRequest("GET", url, nil)
-    request.Header.Set("Content-type", "application/json")
+    url.WriteString(data.BaseUrl)
+    url.WriteString(data.Path)
 
-    if err != nil {
-        log.Fatalln(err)
+    if data.Method == "" {
+        data.Method = http.MethodGet
     }
+
+    request, err := http.NewRequest(http.MethodGet, url.String(), nil)
+
+    for k, v := range default_header {
+        request.Header.Set(k, v)
+    }
+
+    request.Header = data.Headers
+
+
+    /*if err != nil {
+        return RespHttp{}, err
+    }*/
 
     resp, err := client.Do(request)
 
+
     if err != nil {
-        log.Fatalln(err)
+        return RespHttp{}, err
     }
 
     defer resp.Body.Close()
@@ -52,9 +79,29 @@ func DoGet(data HttpReqData) {
     body, err := ioutil.ReadAll(resp.Body)
 
     if err != nil {
-        log.Fatalln(err)
+        return RespHttp{}, err
     }
 
-    log.Println(string(body))
-    //log.Println(resp.Status)
+
+    var result map[string]interface{}
+    json.Unmarshal(body,&result)
+
+    respHttp.Body = result
+
+    respHttp.Headers = resp.Header
+    respHttp.StatusCode = resp.StatusCode
+
+    //resolver
+    //fmt.Println(string(body))
+    //var result map[string]interface{}
+    //json.Unmarshal(body,&result)
+    //hola := result["data"].([]interface{})
+    //fmt.Println(hola[0].(map[string]interface{})["employee_salary"])
+
+
+    // ver tipo de dato
+    //xType := fmt.Sprintf("%T", hola[0])
+    //fmt.Println(xType)
+
+    return respHttp, nil
 }

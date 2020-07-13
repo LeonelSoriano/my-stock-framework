@@ -9,15 +9,15 @@ import (
     "strings"
 )
 
-// Default name form enviroment vars
+// Default name form environment vars
 var envPath string = ".env"
 
-// param to init Env vars
+// parameter to init env vars
 type IntiEnvParams struct {
     EnvPath string // path to .env file
 }
 
-// init and add var to Enviroment
+// init and add var to Environment
 //
 // circumstances:
 //    - if line is "" return ("", "")
@@ -63,7 +63,7 @@ func parceEnv(line string) (string, string) {
     if len(split) != 2 { // have only key
         return "", ""
     }
-    return split[0],split[1] // is ok
+    return split[0],split[1] // is OK
 }
 
 
