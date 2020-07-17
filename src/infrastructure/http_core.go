@@ -3,7 +3,7 @@ package infrastructure
 import (
     "net/http"
     "time"
-    _"log"
+    "log"
     "io/ioutil"
     "strings"
     "encoding/json"
@@ -13,6 +13,7 @@ import (
 /*type httpData struct{
 
 }*/
+
 
 // default header for all http request
 var default_header = map[string]string{
@@ -26,6 +27,7 @@ type HttpReqData struct {
     Headers http.Header
     ParamUrl  map[string]string // parameters in URL example: local?test=1&other=2
     Method string
+    DisableStrategy bool
 }
 
 // data response http request
@@ -37,6 +39,16 @@ type RespHttp struct {
 
 // Call Http request get
 func Do(data HttpReqData) (RespHttp, error) {
+
+    if (data.Headers == nil) {
+        data.Headers = http.Header{}
+    }
+
+    if (httpStrategy != HttpSecurity{} &&
+        data.DisableStrategy == false) {
+        httpStrategy.Strategy.Add(&data)
+    }
+
     timeOut := time.Duration(5 * time.Second)
 
     var respHttp RespHttp // wrapper response http
@@ -54,12 +66,12 @@ func Do(data HttpReqData) (RespHttp, error) {
         data.Method = http.MethodGet
     }
 
-    request, err := http.NewRequest(http.MethodGet, url.String(), nil)
+    request, err := http.NewRequest(data.Method, url.String(), nil)
 
     for k, v := range default_header {
         request.Header.Set(k, v)
     }
-
+    log.Println(data.Headers)
     request.Header = data.Headers
 
 
