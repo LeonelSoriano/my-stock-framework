@@ -3,7 +3,7 @@ package infrastructure
 import (
     "net/http"
     "time"
-    "log"
+    _"log"
     "io/ioutil"
     "strings"
     "encoding/json"
@@ -71,7 +71,6 @@ func Do(data HttpReqData) (RespHttp, error) {
     for k, v := range default_header {
         request.Header.Set(k, v)
     }
-    log.Println(data.Headers)
     request.Header = data.Headers
 
 

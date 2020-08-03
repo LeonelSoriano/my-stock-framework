@@ -7,6 +7,7 @@ import (
     "os"
     "path/filepath"
     "strings"
+    "errors"
 )
 
 // Default name form environment vars
@@ -27,19 +28,32 @@ type IntiEnvParams struct {
 func IntiEnv(params IntiEnvParams) error {
 
     if params.EnvPath != "" {
-        envPath = params.EnvPath
+        envPath = params.EnvPath + ".env"
     }
+
+    fileInfo, err := os.Stat(envPath)
+
+    if err != nil {
+      return err
+    }
+
+    if fileInfo.IsDir() {
+        return errors.New(".env cant be folder")
+    }
+
     absPath, _ := filepath.Abs(envPath)
     file, err := os.Open(absPath)
 
-   if err != nil {
+    if err != nil {
         return err
+
     }
     defer file.Close()
 
     scanner := bufio.NewScanner(file)
 
     for scanner.Scan() {
+
         key, value := parceEnv(scanner.Text())
         if key != "" {
             os.Setenv(key, value)
